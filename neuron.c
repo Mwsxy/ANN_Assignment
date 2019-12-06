@@ -217,3 +217,17 @@ void ShowLayer(NEURON_LAYER *L1)
 	return;
 }
 // TODO: finish backpropogation
+void BackPropogation(NEURON_LAYER *Network[],int num_layer,double Y[],LOSS_PF Cost_pf)
+{
+	double gradiant[LEN];
+	double cost=0;
+	NEURON_LAYER *L;
+	int i,n,num;
+
+	// the Output Layer
+	i = num_layer-1;
+	L = Network[i];
+
+	// the Hidden Layer
+
+}

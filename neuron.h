@@ -6,6 +6,7 @@
 
 //---------Type Declaration-------
 typedef double (*ACT_PF)(double z);
+typedef double (*LOSS_PF)(double *output,double *result, int n);
 /***
  *     \
  *    ---w1
