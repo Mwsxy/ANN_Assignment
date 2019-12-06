@@ -1,3 +1,6 @@
+# Customs
+build/
+CmakeFiles/
 # Prerequisites
 *.d
 
