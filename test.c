@@ -4,6 +4,7 @@
 #include<math.h>
 #include "neuron.h"
 #include "randtool.h"
+#include "mnist_file.h"
 // test simple neuron
 void test1()
 {
@@ -52,15 +53,24 @@ void test2()
 void test3()
 {
     NEURON_LAYER *L0,*L1,*L2,*L3,*LA[10];
-    double Input[LEN];
+    double Input[LEN],Output[LEN];
     int num[]={3,5,3},num0,num_layer;
     int i,j,k;
+	int iter_n; // 迭代次数
 
     num_layer=sizeof(num)/sizeof(int);
     // input layer L0
     num0=num[0];
     for (i=0;i<num0;i++)
-        Input[i]=rand_uniform(-5,10);
+	{
+		Input[i]=rand_uniform(-5,10);
+		Output[i] = rand_uniform(0,15);
+	}
+
+	// Input[0]=Input[1]=Input[2]=1;
+	// Output[0]=Output[1]=Output[2]=2;
+
+
     i=0;
     LA[i] = LAYER_New(i,num[i]);
     LAYER_Init(LA[i],NULL,num[i],NULL,NULL,Input);
@@ -73,10 +83,44 @@ void test3()
     }
     //------finish: initialization------
 
-
     Forward(LA[1]);
     ShowLayer(LA[0]);
+	iter_n = 10;
+	for (int  i = 0; i < iter_n; i++)
+	{
+		BackPropagation(LA,num_layer,Output,OLS,tanh,tanh_p,0.4);
+		Forward(LA[1]);
+	}
+	
     return;
+}
+
+// test load data
+#define STEPS 1000
+#define BATCH_SIZE 100
+void test4()
+{
+	const char * train_images_file = "data/train-images.idx3-ubyte";
+	const char * train_labels_file = "D:\\code\\C\\ANN\\data\\train-labels.idx1-ubyte";
+	const char * test_images_file = "D:\\code\\C\\ANN\\data\\t10k-images.idx3-ubyte";
+	const char * test_labels_file = "D:\\code\\C\\ANN\\data\\t10k-labels.idx1-ubyte";
+
+
+	mnist_dataset_t * train_dataset, * test_dataset;
+    mnist_dataset_t batch;
+
+    float loss, accuracy;
+    int i, batches;
+
+    // Read the datasets from the files
+    train_dataset = mnist_get_dataset(train_images_file, train_labels_file);
+    test_dataset = mnist_get_dataset(test_images_file, test_labels_file);
+
+
+	// Cleanup
+    mnist_free_dataset(train_dataset);
+    mnist_free_dataset(test_dataset);
+
 }
 
 typedef void (*PF)(void);
@@ -87,6 +131,7 @@ void TEST()
         test1,
         test2,
         test3,
+		test4,
     };
     int i,n=sizeof(T)/sizeof(PF);
     for (i=0;i<n;i++)

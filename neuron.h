@@ -29,7 +29,7 @@ typedef struct tag_neuron
 typedef struct tag_layer
 {
 	int num,level;  // num of units
-	struct tag_layer * next_layer;
+	struct tag_layer *prev_layer,*next_layer;
 	NEURON *units[LEN];
 } NEURON_LAYER;
 
@@ -40,6 +40,8 @@ typedef struct tag_layer
 double equal(double x);
 double sigmoid(double z);
 double tanh(double x);
+double tanh_p(double x);
+double OLS(double *output,double *result, int n);
 NEURON *NEURON_New(int level,int index);
 void NEURON_Del(NEURON* p);
 void NEURON_Init(NEURON *N,
@@ -58,6 +60,14 @@ void LAYER_Init(NEURON_LAYER *L,NEURON_LAYER *Pre, int neuron_num,
 				double data[]);
 // void LAYER_FullConnectInput(NEURON_LAYER *L,double x[],int num);
 void Forward(NEURON_LAYER *L1);
+void BackPropagation(NEURON_LAYER *Network[],
+					 int num_layer,  
+					 double Y[],	     // 数据结果  				
+					 LOSS_PF Cost_pf,	 // 损失函数
+					 ACT_PF act, 		 // 激活函数
+					 ACT_PF act_p,	     // 激活函数的导数
+					 double rate	     // 学习速率
+					 );
 void ShowLayer(NEURON_LAYER *L1);
 
 

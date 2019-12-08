@@ -1,4 +1,6 @@
 # Customs
+.vscode/
+.vscode/*
 build/
 CmakeFiles/
 # Prerequisites

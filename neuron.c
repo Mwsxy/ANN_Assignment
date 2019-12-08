@@ -12,12 +12,19 @@ double sigmoid(double z)
 	return 1/(1+exp(-z));
 }
 
-// double tanh(double x)
-// {
-// 	double e1 = exp(x);
-// 	double e2 = exp(-x);
-// 	return (e1-e2)/(e1+e2);
-// }
+double tanh(double x)
+{
+	double e1 = exp(x);
+	double e2 = exp(-x);
+	return (e1-e2)/(e1+e2);
+}
+
+// tanh的导数
+double tanh_p(double x)
+{
+	double t = tanh(x);
+	return 1 - t*t;
+}
 
 static double Xavier_Generator(int n1, int n2)
 {
@@ -77,8 +84,8 @@ void NEURON_Calc(NEURON *N)
 	int i;
 	double sum = N->w[0];
 	if (N->level==0) return;
-	for (i=1;i<N->num;i++)
-		sum+=N->w[i] * (*N->x[i]);
+	for (i=0;i<N->num;i++)
+		sum+=N->w[i+1] * (*N->x[i+1]);
 	N->z=sum;
 	N->a=N->f(sum);
 
@@ -93,6 +100,7 @@ NEURON_LAYER *LAYER_New(int level,int num)
 	if (!p) return NULL;
 	p->num=num;
 	p->level=level;
+	p->prev_layer=NULL;
 	p->next_layer=NULL;
 	for (i=0;i<num;i++)
 		p->units[i]=NEURON_New(level,i);
@@ -127,6 +135,7 @@ void LAYER_Init(NEURON_LAYER *L,NEURON_LAYER *Pre,
 	double *x[LEN];
 	double bias;
 	if (!L) return;
+	L->prev_layer=Pre;
 	// use LAYER_Connect to define next layer
 	L->next_layer=NULL;
 	// default activication function is equal(no function)
@@ -216,18 +225,95 @@ void ShowLayer(NEURON_LAYER *L1)
 	}
 	return;
 }
-// TODO: finish backpropogation
-void BackPropogation(NEURON_LAYER *Network[],int num_layer,double Y[],LOSS_PF Cost_pf)
+// 最小二乘法, Ordinary Least Squares
+double OLS(double *output,double *result, int n)
 {
-	double gradiant[LEN];
-	double cost=0;
+	int i;
+	double sum=0;
+
+	for (i=0;i<n;i++)
+		sum+=(result[i]-output[i])*(result[i]-output[i]);
+	sum/=n;
+	sum*=0.5;
+
+	return sum;
+}
+
+
+// TODO: finish backpropagation
+void BackPropagation(NEURON_LAYER *Network[],
+					 int num_layer,  
+					 double Y[],	     // 数据结果  				
+					 LOSS_PF Cost_pf,	 // 损失函数
+					 ACT_PF act, 		 // 激活函数
+					 ACT_PF act_p,	     // 激活函数的导数
+					 double rate	     // 学习速率
+					 )
+{
+	double **grad,deviation[LEN],d1[LEN],d2[LEN];
+	double cost=0,Output[LEN],tmp,sum;
 	NEURON_LAYER *L;
-	int i,n,num;
+	int level,i,j,l,n,num;
 
+	grad = malloc(sizeof(double*)*LEN);
+	for (i=0;i<LEN;i++)
+		grad[i] = malloc(sizeof(double)*LEN);
 	// the Output Layer
-	i = num_layer-1;
-	L = Network[i];
+	level = num_layer-1;
+	L = Network[level];
+	for (i=0;i<L->num;i++)
+		Output[i]=L->units[i]->a;
+	// calculate the cost
+	cost = Cost_pf(Output,Y,L->num);
 
-	// the Hidden Layer
+	n = L->num;
+	for (i=0;i<n;i++)
+		d1[i]=(L->units[i]->a-Y[i])*act_p(L->units[i]->z);
+	for (i=0;i<n;i++)	// for each neuron unit
+		for (j=0;j<L->units[i]->num;j++)	// for each weight
+		{
+			// calculate the last layer gradiant, but use it later.
+			grad[i][j]=d1[i] * L->prev_layer->units[j]->a;
+		}
 
+	// the Hidden Layer	
+	for (l=level-1;l>0;l--)
+	{
+		L = Network[l];
+		n = L->num;
+
+		// 1. calculate the new deviation
+		for (i=0;i<n;i++)
+		{
+			d2[i] = 0;
+			for (j=0;j<L->next_layer->num;j++)
+				d2[i] += d1[j] * L->next_layer->units[j]->w[i+1] * act_p(L->units[i]->z);
+			
+		}
+
+		// 2. update the weight ( we need the old to cal d2)
+		for (i=0;i<L->next_layer->num;i++)
+		{
+			L->next_layer->units[i]->w[0] -= d1[i];
+			for (j=0; j < L->next_layer->units[i]->num;j++)
+				L->next_layer->units[i]->w[j+1] -= rate*grad[i][j];
+		}	
+		// 3. transfer d2 to d1 (for loop)
+		for (i=0;i<n;i++)
+			d1[i]=d2[i];
+
+		// 4. calculate new grad
+		for (i=0;i<n;i++)	// for each neuron unit
+			for (j=0;j<L->units[i]->num;j++)	// for each weight
+			{
+				// calculate the last layer gradiant, but use it later.
+				grad[i][j]=d1[i] * L->prev_layer->units[j]->a;
+			}	
+
+	}
+	
+	printf("COST = %lf\n",cost);
+
+	free(grad);
+	return;
 }

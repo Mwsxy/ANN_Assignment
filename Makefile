@@ -177,6 +177,60 @@ neuron.c.s:
 	$(MAKE) -f CMakeFiles/ANN.dir/build.make CMakeFiles/ANN.dir/neuron.c.s
 .PHONY : neuron.c.s
 
+randtool.o: randtool.c.o
+
+.PHONY : randtool.o
+
+# target to build an object file
+randtool.c.o:
+	$(MAKE) -f CMakeFiles/ANN.dir/build.make CMakeFiles/ANN.dir/randtool.c.o
+.PHONY : randtool.c.o
+
+randtool.i: randtool.c.i
+
+.PHONY : randtool.i
+
+# target to preprocess a source file
+randtool.c.i:
+	$(MAKE) -f CMakeFiles/ANN.dir/build.make CMakeFiles/ANN.dir/randtool.c.i
+.PHONY : randtool.c.i
+
+randtool.s: randtool.c.s
+
+.PHONY : randtool.s
+
+# target to generate assembly for a file
+randtool.c.s:
+	$(MAKE) -f CMakeFiles/ANN.dir/build.make CMakeFiles/ANN.dir/randtool.c.s
+.PHONY : randtool.c.s
+
+test.o: test.c.o
+
+.PHONY : test.o
+
+# target to build an object file
+test.c.o:
+	$(MAKE) -f CMakeFiles/ANN.dir/build.make CMakeFiles/ANN.dir/test.c.o
+.PHONY : test.c.o
+
+test.i: test.c.i
+
+.PHONY : test.i
+
+# target to preprocess a source file
+test.c.i:
+	$(MAKE) -f CMakeFiles/ANN.dir/build.make CMakeFiles/ANN.dir/test.c.i
+.PHONY : test.c.i
+
+test.s: test.c.s
+
+.PHONY : test.s
+
+# target to generate assembly for a file
+test.c.s:
+	$(MAKE) -f CMakeFiles/ANN.dir/build.make CMakeFiles/ANN.dir/test.c.s
+.PHONY : test.c.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -192,6 +246,12 @@ help:
 	@echo "... neuron.o"
 	@echo "... neuron.i"
 	@echo "... neuron.s"
+	@echo "... randtool.o"
+	@echo "... randtool.i"
+	@echo "... randtool.s"
+	@echo "... test.o"
+	@echo "... test.i"
+	@echo "... test.s"
 .PHONY : help
 
 

@@ -1,4 +1,12 @@
 {
     "cmake.configureOnOpen": true,
     "C_Cpp.default.configurationProvider": "vector-of-bool.cmake-tools",
+    "files.associations": {
+        "fstream": "c",
+        "bit": "c",
+        "*.tcc": "c",
+        "functional": "c",
+        "random": "c",
+        "limits": "c"
+    },
 }
