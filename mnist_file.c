@@ -88,7 +88,7 @@ mnist_image_t * get_images(const char * path, uint32_t * number_of_images)
     FILE * stream;
     mnist_image_file_header_t header;
     mnist_image_t * images;
-    printf("%s\n",path);
+    
     stream = fopen(path, "rb");
 
     if (NULL == stream) {
